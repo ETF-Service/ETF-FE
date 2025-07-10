@@ -1,17 +1,25 @@
-import Sidebar from "./components/Sidebar";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Login from "./components/Login";
 import MainContent from "./components/MainContent";
-import Footer from "./components/Footer";
+import Signup from "./components/Signup";
+import Sidebar from "./components/Sidebar";
 
 function App() {
   return (
-    <div>
-      {/* 고정된 사이드바 */}
-      <Sidebar />
-      {/* 사이드바 너비만큼 padding-left 적용 */}
-      <div className="pl-72">
-        <MainContent />
-      </div>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/" element={
+          <div className="flex">
+            <Sidebar />
+            <div className="flex-1 pl-72">
+              <MainContent />
+            </div>
+          </div>
+        } />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
