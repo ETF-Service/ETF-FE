@@ -30,9 +30,9 @@ const Sidebar = () => {
       {/* 모델 선택 및 API 키 입력 */}
       <div className="mb-6">
         <div className="mb-2 font-semibold">모델 선택 및 API 키 입력</div>
-        <label className="block text-xs mb-1" htmlFor="api-key">API_KEY</label>
+        <label className="block text-sm mb-1" htmlFor="api-key">API KEY</label>
         <input id="api-key" type="text" placeholder="API 키를 입력하세요" className="w-full p-2 rounded bg-gray-800 border border-gray-700 text-sm mb-3" />
-        <label className="block text-xs mb-1" htmlFor="model">사용할 모델</label>
+        <label className="block text-sm mb-1" htmlFor="model">사용할 모델</label>
         <select id="model" className="w-full p-2 rounded bg-gray-800 border border-gray-700 text-sm">
           <option>Clova X</option>
           <option>GPT-4o</option>
@@ -42,8 +42,8 @@ const Sidebar = () => {
       {/* 사용자 정보 */}
       <div className="mb-6">
         <div className="font-semibold mb-2">사용자 정보</div>
-        <div className="mb-2">
-          <div className="text-xs mb-1">이름</div>
+        <div className="mb-4">
+          <div className="text-sm mb-1">이름</div>
           <input
             type="text"
             value={userName}
@@ -53,7 +53,7 @@ const Sidebar = () => {
           />
         </div>
         <div className="mb-2">
-          <div className="flex justify-between text-xs mb-1">
+          <div className="flex justify-between text-sm mb-1">
             <span>투자 성향(0 보수적~10 공격적)</span>
             <span className="font-bold text-red-400">{riskLevel !== "" ? riskLevel : "-"}</span>
           </div>
@@ -67,7 +67,7 @@ const Sidebar = () => {
           />
         </div>
         <div>
-          <div className="text-xs mb-1">현재 투자하고 있는 ETF</div>
+          <div className="text-sm mb-1">현재 투자하고 있는 ETF</div>
           <div className="flex flex-col gap-1 mb-2">
             {ETF_LIST.map((etf) => (
               <label key={etf} className="flex items-center gap-2 text-xs cursor-pointer">
