@@ -5,11 +5,27 @@ const Signup = () => {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
-    // 회원가입 처리 로직 (추후 구현)
+    setError("");
+    try {
+      const res = await fetch("http://localhost:8000/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: userId, password, name }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.detail || "회원가입 실패");
+        return;
+      }
+      navigate("/login");
+    } catch (err) {
+      setError("서버 연결 오류");
+    }
   };
 
   const handleLoginClick = (e) => {
@@ -48,6 +64,7 @@ const Signup = () => {
           className="p-3 rounded bg-gray-800 text-white placeholder-gray-400 border border-gray-700 focus:outline-none"
           required
         />
+        {error && <div className="text-red-400 text-sm text-center">{error}</div>}
         <button
           type="submit"
           className="bg-blue-700 hover:bg-blue-600 text-white font-semibold py-3 rounded"

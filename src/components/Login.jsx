@@ -4,11 +4,27 @@ import { useNavigate } from "react-router-dom";
 const Login = () => {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // 로그인 처리 로직 (추후 구현)
+    setError("");
+    try {
+      const res = await fetch("http://localhost:8000/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: userId, password }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.detail || "로그인 실패");
+        return;
+      }
+      navigate("/");
+    } catch (err) {
+      setError("서버 연결 오류");
+    }
   };
 
   const handleSignupClick = (e) => {
@@ -39,6 +55,7 @@ const Login = () => {
           className="p-3 rounded bg-gray-800 text-white placeholder-gray-400 border border-gray-700 focus:outline-none"
           required
         />
+        {error && <div className="text-red-400 text-sm text-center">{error}</div>}
         <button
           type="submit"
           className="bg-blue-700 hover:bg-blue-600 text-white font-semibold py-3 rounded"
