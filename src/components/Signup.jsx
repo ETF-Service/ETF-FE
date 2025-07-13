@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import apiService from "../services/api";
 
 const Signup = () => {
   const [userId, setUserId] = useState("");
@@ -12,19 +13,10 @@ const Signup = () => {
     e.preventDefault();
     setError("");
     try {
-      const res = await fetch("http://localhost:8000/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: userId, password, name }),
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        setError(data.detail || "회원가입 실패");
-        return;
-      }
+      await apiService.signup(userId, password, name);
       navigate("/login");
-    } catch (err) {
-      setError("서버 연결 오류");
+    } catch (error) {
+      setError(error.message || "회원가입 실패");
     }
   };
 

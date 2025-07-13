@@ -1,29 +1,35 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import useAuthStore from "../stores/authStore";
+import apiService from "../services/api";
 
 const Login = () => {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuthStore();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
+    setIsLoading(true);
+    
     try {
-      const res = await fetch("http://localhost:8000/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: userId, password }),
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        setError(data.detail || "로그인 실패");
-        return;
-      }
+      const response = await apiService.login(userId, password);
+      
+      // 로그인 성공 시 상태 업데이트
+      login(
+        { username: userId, name: response.name },
+        response.access_token
+      );
+      
       navigate("/");
-    } catch (err) {
-      setError("서버 연결 오류");
+    } catch (error) {
+      setError(error.message || "로그인 실패");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -58,9 +64,10 @@ const Login = () => {
         {error && <div className="text-red-400 text-sm text-center">{error}</div>}
         <button
           type="submit"
-          className="bg-blue-700 hover:bg-blue-600 text-white font-semibold py-3 rounded"
+          disabled={isLoading}
+          className="bg-blue-700 hover:bg-blue-600 disabled:bg-blue-800 text-white font-semibold py-3 rounded"
         >
-          로그인
+          {isLoading ? "로그인 중..." : "로그인"}
         </button>
         <div className="flex justify-between text-sm text-gray-400 mt-2">
           <a href="/signup" onClick={handleSignupClick} className="hover:underline">회원가입</a>
