@@ -15,7 +15,7 @@ function App() {
           <ProtectedRoute>
           <div className="flex">
             <Sidebar />
-            <div className="flex-1 pl-72">
+            <div className="flex-1 pl-80">
               <MainContent />
             </div>
           </div>
