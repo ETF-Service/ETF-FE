@@ -44,10 +44,10 @@ class ApiService {
     });
   }
 
-  async signup(username, password, name) {
+  async signup(username, password, name, email) {
     return this.request('/signup', {
       method: 'POST',
-      body: JSON.stringify({ username, password, name }),
+      body: JSON.stringify({ username, password, name, email }),
     });
   }
 

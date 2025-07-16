@@ -6,6 +6,7 @@ const Signup = () => {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
@@ -13,7 +14,7 @@ const Signup = () => {
     e.preventDefault();
     setError("");
     try {
-      await apiService.signup(userId, password, name);
+      await apiService.signup(userId, password, name, email);
       navigate("/login");
     } catch (error) {
       setError(error.message || "회원가입 실패");
@@ -53,6 +54,14 @@ const Signup = () => {
           placeholder="이름"
           value={name}
           onChange={e => setName(e.target.value)}
+          className="p-3 rounded bg-gray-800 text-white placeholder-gray-400 border border-gray-700 focus:outline-none"
+          required
+        />
+        <input
+          type="email"
+          placeholder="이메일"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
           className="p-3 rounded bg-gray-800 text-white placeholder-gray-400 border border-gray-700 focus:outline-none"
           required
         />
