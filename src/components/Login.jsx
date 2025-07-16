@@ -21,7 +21,7 @@ const Login = () => {
       
       // 로그인 성공 시 상태 업데이트
       login(
-        { username: userId, name: response.name },
+        { userId: userId, name: response.name },
         response.access_token
       );
       

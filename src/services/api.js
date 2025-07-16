@@ -37,31 +37,31 @@ class ApiService {
   }
 
   // 인증 관련 API
-  async login(username, password) {
-    return this.request('/login', {
+  async login(userId, password) {
+    return this.request('/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ userId, password }),
     });
   }
 
-  async signup(username, password, name, email) {
-    return this.request('/signup', {
+  async signup(userId, password, name, email) {
+    return this.request('/users', {
       method: 'POST',
-      body: JSON.stringify({ username, password, name, email }),
+      body: JSON.stringify({ userId, password, name, email }),
     });
   }
 
   async getCurrentUser() {
-    return this.request('/me');
+    return this.request('/users/me');
   }
 
-  // ETF 관련 API (향후 구현)
+  // ETF 관련 API (RESTful)
   async getUserPortfolio() {
-    return this.request('/portfolio');
+    return this.request('/users/me/portfolios');
   }
 
   async deleteAllPortfolios() {
-    return this.request('/portfolio', {
+    return this.request('/users/me/portfolios', {
       method: 'DELETE',
     });
   }
@@ -69,24 +69,23 @@ class ApiService {
   async updateInvestmentSettings(settings) {
     try {
       // 먼저 기존 설정이 있는지 확인
-      const existingSettings = await this.request('/portfolio');
-      
+      const existingSettings = await this.request('/users/me/portfolios');
       if (existingSettings.settings) {
         // 기존 설정이 있으면 PUT
-        return this.request('/settings', {
+        return this.request('/users/me/settings', {
           method: 'PUT',
           body: JSON.stringify(settings),
         });
       } else {
         // 기존 설정이 없으면 POST
-        return this.request('/settings', {
+        return this.request('/users/me/settings', {
           method: 'POST',
           body: JSON.stringify(settings),
         });
       }
     } catch {
       // 설정이 없으면 POST
-      return this.request('/settings', {
+      return this.request('/users/me/settings', {
         method: 'POST',
         body: JSON.stringify(settings),
       });
@@ -95,7 +94,7 @@ class ApiService {
 
   // 챗봇 관련 API
   async sendMessage(message) {
-    return this.request('/chat', {
+    return this.request('/chats', {
       method: 'POST',
       body: JSON.stringify({ content: message }),
     });
@@ -109,7 +108,7 @@ class ApiService {
     };
 
     try {
-      const response = await fetch(`${this.baseURL}/chat/stream`, {
+      const response = await fetch(`${this.baseURL}/chats/stream`, {
         method: 'POST',
         headers,
         body: JSON.stringify({ content: message }),
