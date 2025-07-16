@@ -37,17 +37,17 @@ class ApiService {
   }
 
   // 인증 관련 API
-  async login(user_id, password) {
+  async login(userId, password) {
     return this.request('/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ user_id, password }),
+      body: JSON.stringify({ userId, password }),
     });
   }
 
-  async signup(user_id, password, name, email) {
+  async signup(userId, password, name, email) {
     return this.request('/users', {
       method: 'POST',
-      body: JSON.stringify({ user_id, password, name, email }),
+      body: JSON.stringify({ userId, password, name, email }),
     });
   }
 
