@@ -100,6 +100,10 @@ class ApiService {
     });
   }
 
+  async loadChatHistory(limit = 50) {
+    return this.request(`/chat/history?limit=${limit}`);
+  }
+
   async sendMessageStream(message, onChunk) {
     const authStore = useAuthStore.getState();
     const headers = {
@@ -108,7 +112,7 @@ class ApiService {
     };
 
     try {
-      const response = await fetch(`${this.baseURL}/chats/stream`, {
+      const response = await fetch(`${this.baseURL}/chat/stream`, {
         method: 'POST',
         headers,
         body: JSON.stringify({ content: message }),

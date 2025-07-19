@@ -19,15 +19,13 @@ const MainContent = () => {
     updateLastMessage, 
     setLoading, 
     setStreaming,
-    initializeChat 
+    loadHistory 
   } = useChatStore();
 
-  // 컴포넌트 마운트 시 챗봇 초기화
+  // 컴포넌트 마운트 시 대화 히스토리 로드
   useEffect(() => {
-    if (messages.length === 0) {
-      initializeChat();
-    }
-  }, [initializeChat, messages.length]);
+    loadHistory();
+  }, [loadHistory]);
 
   // 메시지가 추가될 때마다 스크롤을 맨 아래로
   useEffect(() => {
@@ -134,7 +132,7 @@ const MainContent = () => {
       {/* 챗봇 대화 영역 - 개선된 스크롤바와 그라데이션 */}
       <div className="flex-1 mx-6 rounded-2xl p-6 overflow-y-auto mb-4 relative" 
            style={{ 
-             maxHeight: 'calc(100vh - 280px)',
+             maxHeight: 'calc(100vh - 200px)',
              background: 'linear-gradient(135deg, rgba(17, 24, 39, 0.8) 0%, rgba(31, 41, 55, 0.8) 100%)',
              backdropFilter: 'blur(10px)',
              border: '1px solid rgba(75, 85, 99, 0.3)'
