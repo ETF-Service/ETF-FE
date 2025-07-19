@@ -62,8 +62,10 @@ const MainContent = () => {
       addMessage(assistantMessage);
       setStreaming(true);
 
+      let accumulatedContent = '';
       await apiService.sendMessageStream(question.trim(), (chunk) => {
-        updateLastMessage(assistantMessage.content + chunk);
+        accumulatedContent += chunk;
+        updateLastMessage(accumulatedContent);
       });
 
       setStreaming(false);

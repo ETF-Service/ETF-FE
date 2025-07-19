@@ -106,7 +106,7 @@ const Sidebar = () => {
 
       // 새로운 포트폴리오 생성
       for (const portfolio of portfolioData) {
-        await apiService.request('/portfolio', {
+        await apiService.request('/users/me/portfolios', {
           method: 'POST',
           body: JSON.stringify(portfolio)
         });
