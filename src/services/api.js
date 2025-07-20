@@ -56,8 +56,12 @@ class ApiService {
   }
 
   // ETF 관련 API (RESTful)
-  async getUserPortfolio() {
-    return this.request('/users/me/portfolios');
+  async getUserInvestmentSettings() {
+    return this.request('/users/me/settings');
+  }
+
+  async getUserETF() {
+    return this.request('/users/me/etf');
   }
 
   async deleteAllPortfolios() {
@@ -67,29 +71,35 @@ class ApiService {
   }
 
   async updateInvestmentSettings(settings) {
+	console.log(settings);
     try {
-      // 먼저 기존 설정이 있는지 확인
-      const existingSettings = await this.request('/users/me/portfolios');
+      const existingSettings = await this.request('/users/me/settings');
       if (existingSettings.settings) {
-        // 기존 설정이 있으면 PUT
         return this.request('/users/me/settings', {
           method: 'PUT',
           body: JSON.stringify(settings),
         });
       } else {
-        // 기존 설정이 없으면 POST
         return this.request('/users/me/settings', {
           method: 'POST',
           body: JSON.stringify(settings),
         });
       }
-    } catch {
-      // 설정이 없으면 POST
-      return this.request('/users/me/settings', {
-        method: 'POST',
-        body: JSON.stringify(settings),
-      });
+    } catch (error) {
+      console.error('Error updating investment settings:', error);
+      throw error;
     }
+  }
+
+  async getETFs() {
+    return this.request('/etfs');
+  }
+
+  async updateETF(etf) {
+    return this.request('/users/me/etf', {
+        method: 'PUT',
+        body: JSON.stringify(etf),
+    });
   }
 
   // 챗봇 관련 API

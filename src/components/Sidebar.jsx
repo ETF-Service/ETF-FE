@@ -13,10 +13,10 @@ const ETF_LIST = [
 
 const Sidebar = () => {
   const [selectedETFs, setSelectedETFs] = useState([]);
-  const [userName, setUserName] = useState("");
+  const [monthlyInvestment, setMonthlyInvestment] = useState("");
   const [riskLevel, setRiskLevel] = useState("5");
   const [apiKey, setApiKey] = useState("");
-  const [modelType, setModelType] = useState("gpt-4o");
+  const [modelType, setModelType] = useState("clova-x");
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
   const { user } = useAuthStore();
@@ -37,22 +37,16 @@ const Sidebar = () => {
   useEffect(() => {
     const loadUserSettings = async () => {
       try {
-        // ETF 초기 데이터 생성 (없는 경우)
-        try {
-          await apiService.request('/init-etfs', { method: 'POST' });
-        } catch {
-          console.log('ETF 데이터가 이미 존재합니다.');
+        const responseSettings = await apiService.getUserInvestmentSettings();
+        if (responseSettings.settings) {
+          setMonthlyInvestment(responseSettings.settings.monthly_investment);
+          setRiskLevel(responseSettings.settings.risk_level?.toString() || "5");
+          setApiKey(responseSettings.settings.api_key || "");
+          setModelType(responseSettings.settings.model_type || "clova-x");
         }
-
-        const response = await apiService.getUserPortfolio();
-        if (response.settings) {
-          setUserName(response.settings.name || user?.name || "");
-          setRiskLevel(response.settings.risk_level?.toString() || "5");
-          setApiKey(response.settings.api_key || "");
-          setModelType(response.settings.model_type || "gpt-4o");
-        }
-        if (response.portfolios) {
-          const etfSymbols = response.portfolios.map(p => `${p.etf.name}(${p.etf.symbol})`);
+        const responseETF = await apiService.getUserETF();
+        if (responseETF.etfs) {
+          const etfSymbols = responseETF.etfs.map(p => `${p.name}(${p.symbol})`);
           setSelectedETFs(etfSymbols);
         }
       } catch (error) {
@@ -66,11 +60,6 @@ const Sidebar = () => {
   }, [user]);
 
   const handleSave = async () => {
-    if (!userName.trim()) {
-      setMessage("이름을 입력해주세요.");
-      return;
-    }
-
     setIsLoading(true);
     setMessage("");
 
@@ -82,34 +71,29 @@ const Sidebar = () => {
       });
 
       // 먼저 ETF 데이터를 가져와서 ID를 찾기
-      const etfsResponse = await apiService.request('/etfs');
+      const etfsResponse = await apiService.getETFs();
       const etfMap = {};
       etfsResponse.forEach(etf => {
         etfMap[etf.symbol] = etf.id;
       });
 
       // 포트폴리오 데이터 준비
-      const portfolioData = etfSymbols.map(symbol => ({
+      const etfsData = etfSymbols.map(symbol => ({
         etf_id: etfMap[symbol],
-        monthly_investment: 100000 // 기본값 10만원, 추후 입력 필드 추가 가능
       }));
 
       // 설정 저장
       await apiService.updateInvestmentSettings({
         risk_level: parseInt(riskLevel),
         api_key: apiKey,
-        model_type: modelType
+        model_type: modelType,
+        monthly_investment: parseInt(monthlyInvestment),
       });
 
-      // 기존 포트폴리오 모두 삭제
-      await apiService.deleteAllPortfolios();
-
-      // 새로운 포트폴리오 생성
-      for (const portfolio of portfolioData) {
-        await apiService.request('/users/me/portfolios', {
-          method: 'POST',
-          body: JSON.stringify(portfolio)
-        });
+      // ETF 데이터 저장
+      for (const etf of etfsData) {
+        console.log(etf.etf_id);
+        await apiService.updateETF(etf);
       }
 
       setMessage("설정이 성공적으로 저장되었습니다!");
@@ -192,15 +176,27 @@ const Sidebar = () => {
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                이름
+                월 투자금액
               </label>
-              <input
-                type="text"
-                value={userName}
-                onChange={e => setUserName(e.target.value)}
-                className="w-full p-3 rounded-xl bg-gray-800/50 border border-gray-600/30 text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 backdrop-blur-sm transition-all duration-200"
-                placeholder="이름을 입력하세요"
-              />
+              <div className="relative">
+                <input
+                  type="number"
+                  value={monthlyInvestment}
+                  onChange={e => setMonthlyInvestment(e.target.value)}
+                  className="w-full p-3 pr-16 rounded-xl bg-gray-800/50 border border-gray-600/30 text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 backdrop-blur-sm transition-all duration-200"
+                  placeholder="0"
+                  min="0"
+                  step="1"
+                />
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-400 font-medium">
+                  만원
+                </div>
+              </div>
+              {monthlyInvestment && (
+                <p className="text-xs text-blue-400 mt-1">
+                  총 {parseInt(monthlyInvestment || 0).toLocaleString()}만원 ({parseInt(monthlyInvestment || 0) * 10000}원)
+                </p>
+              )}
             </div>
             
             <div>
