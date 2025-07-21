@@ -44,9 +44,8 @@ const Sidebar = () => {
           setApiKey(responseSettings.settings.api_key || "");
           setModelType(responseSettings.settings.model_type || "clova-x");
         }
-        const responseETF = await apiService.getUserETF();
-        if (responseETF.etfs) {
-          const etfSymbols = responseETF.etfs.map(p => `${p.name}(${p.symbol})`);
+        if (responseSettings.etfs) {
+          const etfSymbols = responseSettings.etfs.map(p => `${p.name}(${p.symbol})`);
           setSelectedETFs(etfSymbols);
         }
       } catch (error) {
@@ -66,26 +65,8 @@ const Sidebar = () => {
     try {
       // ETF 심볼 추출 (예: "미국 S&P500(SPY)" -> "SPY")
       const etfSymbols = selectedETFs.map(etf => {
-        const match = etf.match(/\(([^)]+)\)/);
-        return match ? match[1] : etf;
+        return etf.split("(")[1].split(")")[0];
       });
-
-      // 먼저 ETF 데이터를 가져와서 ID를 찾기
-      const etfsResponse = await apiService.getETFs();
-      const etfMap = {};
-      etfsResponse.forEach(etf => {
-        etfMap[etf.symbol] = etf.id;
-      });
-
-      // 포트폴리오 데이터 준비
-      const etfsData = etfSymbols.map(symbol => ({
-        etf_id: etfMap[symbol],
-      }));
-
-      // ETF 데이터 저장
-      for (const etf of etfsData) {
-        await apiService.updateETF(etf);
-      }
 
       // 설정 저장
       await apiService.updateInvestmentSettings({
@@ -93,6 +74,7 @@ const Sidebar = () => {
         api_key: apiKey,
         model_type: modelType,
         monthly_investment: parseInt(monthlyInvestment),
+		etf_symbols: etfSymbols,
       });
 
       setMessage("설정이 성공적으로 저장되었습니다!");

@@ -60,16 +60,6 @@ class ApiService {
     return this.request('/users/me/settings');
   }
 
-  async getUserETF() {
-    return this.request('/users/me/etf');
-  }
-
-  async deleteAllPortfolios() {
-    return this.request('/users/me/portfolios', {
-      method: 'DELETE',
-    });
-  }
-
   async updateInvestmentSettings(settings) {
     return this.request('/users/me/settings', {
       method: 'PUT',
@@ -81,12 +71,6 @@ class ApiService {
     return this.request('/etfs');
   }
 
-  async updateETF(etf) {
-    return this.request('/users/me/etf', {
-        method: 'PUT',
-        body: JSON.stringify(etf),
-    });
-  }
 
   // 챗봇 관련 API
   async sendMessage(message) {
