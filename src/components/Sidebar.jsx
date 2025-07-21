@@ -82,6 +82,11 @@ const Sidebar = () => {
         etf_id: etfMap[symbol],
       }));
 
+      // ETF 데이터 저장
+      for (const etf of etfsData) {
+        await apiService.updateETF(etf);
+      }
+
       // 설정 저장
       await apiService.updateInvestmentSettings({
         risk_level: parseInt(riskLevel),
@@ -89,12 +94,6 @@ const Sidebar = () => {
         model_type: modelType,
         monthly_investment: parseInt(monthlyInvestment),
       });
-
-      // ETF 데이터 저장
-      for (const etf of etfsData) {
-        console.log(etf.etf_id);
-        await apiService.updateETF(etf);
-      }
 
       setMessage("설정이 성공적으로 저장되었습니다!");
     } catch (error) {

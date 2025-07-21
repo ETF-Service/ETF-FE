@@ -71,24 +71,10 @@ class ApiService {
   }
 
   async updateInvestmentSettings(settings) {
-	console.log(settings);
-    try {
-      const existingSettings = await this.request('/users/me/settings');
-      if (existingSettings.settings) {
-        return this.request('/users/me/settings', {
-          method: 'PUT',
-          body: JSON.stringify(settings),
-        });
-      } else {
-        return this.request('/users/me/settings', {
-          method: 'POST',
-          body: JSON.stringify(settings),
-        });
-      }
-    } catch (error) {
-      console.error('Error updating investment settings:', error);
-      throw error;
-    }
+    return this.request('/users/me/settings', {
+      method: 'PUT',
+      body: JSON.stringify(settings),
+    });
   }
 
   async getETFs() {
