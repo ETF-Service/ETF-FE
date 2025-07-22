@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import useAuthStore from "../stores/authStore";
 import apiService from "../services/api";
+import ETFInvestmentSettings from "./ETFInvestmentSettings";
 
 const ETF_LIST = [
   "미국 S&P500(SPY)",
@@ -19,6 +20,7 @@ const Sidebar = () => {
   const [modelType, setModelType] = useState("clova-x");
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [activeTab, setActiveTab] = useState("general"); // "general" 또는 "etf-settings"
   const { user } = useAuthStore();
 
   const handleETFChange = (etf) => {
@@ -86,6 +88,12 @@ const Sidebar = () => {
     }
   };
 
+  // ETF 설정 변경 핸들러
+  const handleETFSettingsChange = (settings) => {
+    console.log('ETF 설정 변경:', settings);
+    // 여기서 필요한 추가 로직을 수행할 수 있습니다
+  };
+
   return (
     <aside className="fixed top-0 left-0 h-screen w-80 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white flex flex-col z-40 border-r border-gray-700/50 shadow-2xl">
       {/* 스크롤 가능한 컨테이너 */}
@@ -103,200 +111,238 @@ const Sidebar = () => {
           <p className="text-xs text-gray-400">AI 모델과 투자 설정을 관리하세요</p>
         </div>
 
-        {/* 모델 선택 및 API 키 입력 */}
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-6 h-6 bg-gradient-to-r from-green-600 to-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-xs">🤖</span>
-            </div>
-            <h3 className="font-semibold text-gray-200">AI 모델 설정</h3>
-          </div>
-          
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2" htmlFor="api-key">
-                API KEY
-              </label>
-              <input 
-                id="api-key" 
-                type="text" 
-                placeholder="API 키를 입력하세요" 
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                className="w-full p-3 rounded-xl bg-gray-800/50 border border-gray-600/30 text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 backdrop-blur-sm transition-all duration-200" 
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2" htmlFor="model">
-                사용할 모델
-              </label>
-              <select 
-                id="model" 
-                value={modelType}
-                onChange={(e) => setModelType(e.target.value)}
-                className="w-full p-3 rounded-xl bg-gray-800/50 border border-gray-600/30 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 backdrop-blur-sm transition-all duration-200"
-              >
-                <option value="clova-x">Clova X</option>
-                <option value="gpt-4o">GPT-4o</option>
-                <option value="gpt-4o-mini">GPT-4o-mini</option>
-              </select>
-            </div>
+        {/* 탭 네비게이션 */}
+        <div className="mb-6">
+          <div className="flex bg-gray-800/50 rounded-xl p-1">
+            <button
+              onClick={() => setActiveTab("general")}
+              className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
+                activeTab === "general"
+                  ? "bg-blue-600 text-white shadow-lg"
+                  : "text-gray-400 hover:text-gray-200"
+              }`}
+            >
+              일반 설정
+            </button>
+            <button
+              onClick={() => setActiveTab("etf-settings")}
+              className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
+                activeTab === "etf-settings"
+                  ? "bg-blue-600 text-white shadow-lg"
+                  : "text-gray-400 hover:text-gray-200"
+              }`}
+            >
+              ETF 설정
+            </button>
           </div>
         </div>
 
-        {/* 사용자 정보 */}
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-6 h-6 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
-              <span className="text-xs">👤</span>
-            </div>
-            <h3 className="font-semibold text-gray-200">사용자 정보</h3>
-          </div>
-          
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                월 투자금액
-              </label>
-              <div className="relative">
-                <input
-                  type="number"
-                  value={monthlyInvestment}
-                  onChange={e => setMonthlyInvestment(e.target.value)}
-                  className="w-full p-3 pr-16 rounded-xl bg-gray-800/50 border border-gray-600/30 text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 backdrop-blur-sm transition-all duration-200"
-                  placeholder="0"
-                  min="0"
-                  step="1"
-                />
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-400 font-medium">
-                  만원
+        {/* 탭 컨텐츠 */}
+        {activeTab === "general" ? (
+          // 일반 설정 탭
+          <>
+            {/* 모델 선택 및 API 키 입력 */}
+            <div className="mb-8">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-6 h-6 bg-gradient-to-r from-green-600 to-blue-600 rounded-lg flex items-center justify-center">
+                  <span className="text-xs">🤖</span>
                 </div>
+                <h3 className="font-semibold text-gray-200">AI 모델 설정</h3>
               </div>
-              {monthlyInvestment && (
-                <p className="text-xs text-blue-400 mt-1">
-                  총 {parseInt(monthlyInvestment || 0).toLocaleString()}만원 ({parseInt(monthlyInvestment || 0) * 10000}원)
-                </p>
-              )}
-            </div>
-            
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <label className="text-sm font-medium text-gray-300">
-                  투자 성향
-                </label>
-                <span className="text-sm font-bold bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">
-                  {riskLevel !== "" ? riskLevel : "-"}
-                </span>
-              </div>
-              <div className="relative">
-                <input
-                  type="range"
-                  min="0"
-                  max="10"
-                  value={riskLevel}
-                  onChange={e => setRiskLevel(e.target.value)}
-                  className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
-                />
-                <div className="flex justify-between text-xs text-gray-500 mt-1">
-                  <span>보수적</span>
-                  <span>공격적</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* ETF 선택 */}
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-6 h-6 bg-gradient-to-r from-yellow-600 to-orange-600 rounded-lg flex items-center justify-center">
-              <span className="text-xs">📈</span>
-            </div>
-            <h3 className="font-semibold text-gray-200">투자 ETF</h3>
-          </div>
-          
-          <div className="space-y-3">
-            <p className="text-sm text-gray-400">현재 투자하고 있는 ETF를 선택하세요</p>
-            
-            <div className="space-y-2">
-              {ETF_LIST.map((etf) => (
-                <label key={etf} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-800/30 cursor-pointer transition-colors duration-200">
-                  <input
-                    type="checkbox"
-                    checked={selectedETFs.includes(etf)}
-                    onChange={() => handleETFChange(etf)}
-                    className="w-4 h-4 text-blue-600 bg-gray-800 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2" htmlFor="api-key">
+                    API KEY
+                  </label>
+                  <input 
+                    id="api-key" 
+                    type="text" 
+                    placeholder="API 키를 입력하세요" 
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    className="w-full p-3 rounded-xl bg-gray-800/50 border border-gray-600/30 text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 backdrop-blur-sm transition-all duration-200" 
                   />
-                  <span className="text-sm text-gray-300">{etf}</span>
-                </label>
-              ))}
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2" htmlFor="model">
+                    사용할 모델
+                  </label>
+                  <select 
+                    id="model" 
+                    value={modelType}
+                    onChange={(e) => setModelType(e.target.value)}
+                    className="w-full p-3 rounded-xl bg-gray-800/50 border border-gray-600/30 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 backdrop-blur-sm transition-all duration-200"
+                  >
+                    <option value="clova-x">Clova X</option>
+                    <option value="gpt-4o">GPT-4o</option>
+                    <option value="gpt-4o-mini">GPT-4o-mini</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* 사용자 정보 */}
+            <div className="mb-8">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-6 h-6 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
+                  <span className="text-xs">👤</span>
+                </div>
+                <h3 className="font-semibold text-gray-200">사용자 정보</h3>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    월 투자금액
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      value={monthlyInvestment}
+                      onChange={e => setMonthlyInvestment(e.target.value)}
+                      className="w-full p-3 pr-16 rounded-xl bg-gray-800/50 border border-gray-600/30 text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 backdrop-blur-sm transition-all duration-200"
+                      placeholder="0"
+                      min="0"
+                      step="1"
+                    />
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-400 font-medium">
+                      만원
+                    </div>
+                  </div>
+                  {monthlyInvestment && (
+                    <p className="text-xs text-blue-400 mt-1">
+                      총 {parseInt(monthlyInvestment || 0).toLocaleString()}만원 ({parseInt(monthlyInvestment || 0) * 10000}원)
+                    </p>
+                  )}
+                </div>
+                
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="text-sm font-medium text-gray-300">
+                      투자 성향
+                    </label>
+                    <span className="text-sm font-bold bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">
+                      {riskLevel !== "" ? riskLevel : "-"}
+                    </span>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type="range"
+                      min="0"
+                      max="10"
+                      value={riskLevel}
+                      onChange={e => setRiskLevel(e.target.value)}
+                      className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                    />
+                    <div className="flex justify-between text-xs text-gray-500 mt-1">
+                      <span>보수적</span>
+                      <span>공격적</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* ETF 선택 */}
+            <div className="mb-8">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-6 h-6 bg-gradient-to-r from-yellow-600 to-orange-600 rounded-lg flex items-center justify-center">
+                  <span className="text-xs">📈</span>
+                </div>
+                <h3 className="font-semibold text-gray-200">투자 ETF</h3>
+              </div>
+              
+              <div className="space-y-3">
+                <p className="text-sm text-gray-400">현재 투자하고 있는 ETF를 선택하세요</p>
+                
+                <div className="space-y-2">
+                  {ETF_LIST.map((etf) => (
+                    <label key={etf} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-800/30 cursor-pointer transition-colors duration-200">
+                      <input
+                        type="checkbox"
+                        checked={selectedETFs.includes(etf)}
+                        onChange={() => handleETFChange(etf)}
+                        className="w-4 h-4 text-blue-600 bg-gray-800 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+                      />
+                      <span className="text-sm text-gray-300">{etf}</span>
+                    </label>
+                  ))}
+                </div>
+                
+                {/* 선택된 ETF 태그 */}
+                {selectedETFs.length > 0 && (
+                  <div className="mt-4">
+                    <p className="text-sm text-gray-400 mb-2">선택된 ETF:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedETFs.map((etf) => (
+                        <span key={etf} className="flex items-center gap-2 bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-xl px-3 py-1 text-xs text-blue-300 backdrop-blur-sm">
+                          <span>{etf}</span>
+                          <button
+                            className="w-4 h-4 bg-red-500/20 hover:bg-red-500/40 rounded-full flex items-center justify-center text-red-400 hover:text-red-300 transition-colors duration-200"
+                            onClick={() => handleRemoveETF(etf)}
+                            type="button"
+                          >
+                            ✕
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
             
-            {/* 선택된 ETF 태그 */}
-            {selectedETFs.length > 0 && (
-              <div className="mt-4">
-                <p className="text-sm text-gray-400 mb-2">선택된 ETF:</p>
-                <div className="flex flex-wrap gap-2">
-                  {selectedETFs.map((etf) => (
-                    <span key={etf} className="flex items-center gap-2 bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-xl px-3 py-1 text-xs text-blue-300 backdrop-blur-sm">
-                      <span>{etf}</span>
-                      <button
-                        className="w-4 h-4 bg-red-500/20 hover:bg-red-500/40 rounded-full flex items-center justify-center text-red-400 hover:text-red-300 transition-colors duration-200"
-                        onClick={() => handleRemoveETF(etf)}
-                        type="button"
-                      >
-                        ✕
-                      </button>
-                    </span>
-                  ))}
+            {/* 스페이서 - 남은 공간을 차지 */}
+            <div className="flex-1"></div>
+            
+            {/* 메시지 표시 */}
+            {message && (
+              <div className={`text-sm p-4 rounded-xl mb-4 backdrop-blur-sm border ${
+                message.includes('성공') 
+                  ? 'bg-green-900/20 text-green-300 border-green-500/30' 
+                  : 'bg-red-900/20 text-red-300 border-red-500/30'
+              }`}>
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">
+                    {message.includes('성공') ? '✅' : '❌'}
+                  </span>
+                  <span>{message}</span>
                 </div>
               </div>
             )}
-          </div>
-        </div>
-        
-        {/* 스페이서 - 남은 공간을 차지 */}
-        <div className="flex-1"></div>
-        
-        {/* 메시지 표시 */}
-        {message && (
-          <div className={`text-sm p-4 rounded-xl mb-4 backdrop-blur-sm border ${
-            message.includes('성공') 
-              ? 'bg-green-900/20 text-green-300 border-green-500/30' 
-              : 'bg-red-900/20 text-red-300 border-red-500/30'
-          }`}>
-            <div className="flex items-center gap-2">
-              <span className="text-lg">
-                {message.includes('성공') ? '✅' : '❌'}
-              </span>
-              <span>{message}</span>
-            </div>
-          </div>
+            
+            {/* 저장 버튼 */}
+            <button 
+              className={`w-full py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 ${
+                isLoading
+                  ? 'bg-gray-600/50 text-gray-400 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg shadow-blue-500/25'
+              }`}
+              onClick={handleSave}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>저장 중...</span>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center gap-2">
+                  <span>💾</span>
+                  <span>설정 저장</span>
+                </div>
+              )}
+            </button>
+          </>
+        ) : (
+          // ETF 설정 탭
+          <ETFInvestmentSettings 
+            selectedETFs={selectedETFs}
+            onSettingsChange={handleETFSettingsChange}
+          />
         )}
-        
-        {/* 저장 버튼 */}
-        <button 
-          className={`w-full py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 ${
-            isLoading
-              ? 'bg-gray-600/50 text-gray-400 cursor-not-allowed'
-              : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg shadow-blue-500/25'
-          }`}
-          onClick={handleSave}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <div className="flex items-center justify-center gap-2">
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              <span>저장 중...</span>
-            </div>
-          ) : (
-            <div className="flex items-center justify-center gap-2">
-              <span>💾</span>
-              <span>설정 저장</span>
-            </div>
-          )}
-        </button>
       </div>
 
       {/* 커스텀 스타일 */}

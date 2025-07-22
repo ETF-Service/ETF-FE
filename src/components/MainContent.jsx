@@ -9,6 +9,7 @@ const MainContent = () => {
   const [question, setQuestion] = useState("");
   const [showFileUpload, setShowFileUpload] = useState(false);
   const [isNotificationEnabled, setIsNotificationEnabled] = useState(false);
+  const [isComposing, setIsComposing] = useState(false);
   const messagesEndRef = useRef(null);
   const { logout } = useAuthStore();
   const { 
@@ -76,8 +77,8 @@ const MainContent = () => {
     }
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey && !isComposing) {
       e.preventDefault();
       handleSend();
     }
@@ -132,7 +133,7 @@ const MainContent = () => {
       {/* 챗봇 대화 영역 - 개선된 스크롤바와 그라데이션 */}
       <div className="flex-1 mx-6 rounded-2xl p-6 overflow-y-auto mb-4 relative" 
            style={{ 
-             maxHeight: 'calc(100vh - 200px)',
+             maxHeight: 'calc(100vh - 250px)',
              background: 'linear-gradient(135deg, rgba(17, 24, 39, 0.8) 0%, rgba(31, 41, 55, 0.8) 100%)',
              backdropFilter: 'blur(10px)',
              border: '1px solid rgba(75, 85, 99, 0.3)'
@@ -229,7 +230,9 @@ const MainContent = () => {
             <textarea
               value={question}
               onChange={handleInputChange}
-              onKeyDown={handleKeyPress}
+              onKeyDown={handleKeyDown}
+              onCompositionStart={() => setIsComposing(true)}
+              onCompositionEnd={() => setIsComposing(false)}
               placeholder="금융 정보에 대해 질문하세요! (Enter로 전송, Shift+Enter로 줄바꿈)"
               className="w-full h-14 p-4 pr-16 bg-gray-800/50 text-white placeholder-gray-400 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/50 backdrop-blur-sm border border-gray-600/30 transition-all duration-200 overflow-hidden"
               style={{ minHeight: '56px', maxHeight: '120px' }}

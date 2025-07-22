@@ -71,6 +71,34 @@ class ApiService {
     return this.request('/etfs');
   }
 
+  // ETF별 개별 투자 설정 API
+  async getETFInvestmentSettings() {
+    return this.request('/users/me/etf-settings');
+  }
+
+  async updateETFInvestmentSettings(settings) {
+    return this.request('/users/me/etf-settings', {
+      method: 'PUT',
+      body: JSON.stringify({ etf_settings: settings }),
+    });
+  }
+
+  async getETFInvestmentSetting(etfSymbol) {
+    return this.request(`/users/me/etf-settings/${etfSymbol}`);
+  }
+
+  async updateETFInvestmentSetting(etfSymbol, setting) {
+    return this.request(`/users/me/etf-settings/${etfSymbol}`, {
+      method: 'PUT',
+      body: JSON.stringify(setting),
+    });
+  }
+
+  async deleteETFInvestmentSetting(etfSymbol) {
+    return this.request(`/users/me/etf-settings/${etfSymbol}`, {
+      method: 'DELETE',
+    });
+  }
 
   // 챗봇 관련 API
   async sendMessage(message) {
