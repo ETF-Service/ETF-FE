@@ -14,7 +14,6 @@ const ETF_LIST = [
 
 const Sidebar = () => {
   const [selectedETFs, setSelectedETFs] = useState([]);
-  const [monthlyInvestment, setMonthlyInvestment] = useState("");
   const [riskLevel, setRiskLevel] = useState("5");
   const [apiKey, setApiKey] = useState("");
   const [modelType, setModelType] = useState("clova-x");
@@ -31,17 +30,12 @@ const Sidebar = () => {
     }
   };
 
-  const handleRemoveETF = (etf) => {
-    setSelectedETFs(selectedETFs.filter((item) => item !== etf));
-  };
-
   // 컴포넌트 마운트 시 기존 설정 로드
   useEffect(() => {
     const loadUserSettings = async () => {
       try {
         const responseSettings = await apiService.getUserInvestmentSettings();
         if (responseSettings.settings) {
-          setMonthlyInvestment(responseSettings.settings.monthly_investment);
           setRiskLevel(responseSettings.settings.risk_level?.toString() || "5");
           setApiKey(responseSettings.settings.api_key || "");
           setModelType(responseSettings.settings.model_type || "clova-x");
@@ -75,7 +69,6 @@ const Sidebar = () => {
         risk_level: parseInt(riskLevel),
         api_key: apiKey,
         model_type: modelType,
-        monthly_investment: parseInt(monthlyInvestment),
 		etf_symbols: etfSymbols,
       });
 
@@ -194,31 +187,6 @@ const Sidebar = () => {
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    월 투자금액
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="number"
-                      value={monthlyInvestment}
-                      onChange={e => setMonthlyInvestment(e.target.value)}
-                      className="w-full p-3 pr-16 rounded-xl bg-gray-800/50 border border-gray-600/30 text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 backdrop-blur-sm transition-all duration-200"
-                      placeholder="0"
-                      min="0"
-                      step="1"
-                    />
-                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-400 font-medium">
-                      만원
-                    </div>
-                  </div>
-                  {monthlyInvestment && (
-                    <p className="text-xs text-blue-400 mt-1">
-                      총 {parseInt(monthlyInvestment || 0).toLocaleString()}만원 ({parseInt(monthlyInvestment || 0) * 10000}원)
-                    </p>
-                  )}
-                </div>
-                
-                <div>
                   <div className="flex justify-between items-center mb-2">
                     <label className="text-sm font-medium text-gray-300">
                       투자 성향
@@ -254,43 +222,73 @@ const Sidebar = () => {
                 <h3 className="font-semibold text-gray-200">투자 ETF</h3>
               </div>
               
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <p className="text-sm text-gray-400">현재 투자하고 있는 ETF를 선택하세요</p>
                 
-                <div className="space-y-2">
-                  {ETF_LIST.map((etf) => (
-                    <label key={etf} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-800/30 cursor-pointer transition-colors duration-200">
-                      <input
-                        type="checkbox"
-                        checked={selectedETFs.includes(etf)}
-                        onChange={() => handleETFChange(etf)}
-                        className="w-4 h-4 text-blue-600 bg-gray-800 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
-                      />
-                      <span className="text-sm text-gray-300">{etf}</span>
-                    </label>
-                  ))}
+                {/* ETF 선택 카드 그리드 */}
+                <div className="grid grid-cols-1 gap-3">
+                  {ETF_LIST.map((etf) => {
+                    const isSelected = selectedETFs.includes(etf);
+                    const symbol = etf.split("(")[1].split(")")[0];
+                    const name = etf.split("(")[0];
+                    
+                    return (
+                      <div
+                        key={etf}
+                        onClick={() => handleETFChange(etf)}
+                        className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 transform hover:scale-[1.02] ${
+                          isSelected
+                            ? 'bg-gradient-to-r from-blue-600/20 to-purple-600/20 border-blue-500/50 shadow-lg shadow-blue-500/25'
+                            : 'bg-gray-800/30 border-gray-600/30 hover:bg-gray-800/50 hover:border-gray-500/50'
+                        }`}
+                      >
+                        {/* 선택 표시 */}
+                        <div className={`absolute top-3 right-3 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
+                          isSelected
+                            ? 'bg-blue-500 border-blue-500'
+                            : 'border-gray-500'
+                        }`}>
+                          {isSelected && (
+                            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </div>
+                        
+                        {/* ETF 정보 */}
+                        <div className="flex items-center gap-3">
+                          {/* ETF 아이콘 */}
+                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                            isSelected
+                              ? 'bg-gradient-to-r from-blue-500 to-purple-500'
+                              : 'bg-gradient-to-r from-gray-600 to-gray-700'
+                          }`}>
+                            <span className="text-sm font-bold text-white">{symbol}</span>
+                          </div>
+                          
+                          {/* ETF 이름과 설명 */}
+                          <div className="flex-1">
+                            <h4 className={`font-semibold text-sm ${
+                              isSelected ? 'text-blue-300' : 'text-gray-200'
+                            }`}>
+                              {name}
+                            </h4>
+                            <p className="text-xs text-gray-400">
+                              {symbol} • {isSelected ? '선택됨' : '선택 안됨'}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        {/* 호버 효과 */}
+                        <div className={`absolute inset-0 rounded-xl transition-opacity duration-200 ${
+                          isSelected
+                            ? 'bg-gradient-to-r from-blue-500/5 to-purple-500/5 opacity-100'
+                            : 'bg-gradient-to-r from-gray-500/5 to-gray-600/5 opacity-0 hover:opacity-100'
+                        }`} />
+                      </div>
+                    );
+                  })}
                 </div>
-                
-                {/* 선택된 ETF 태그 */}
-                {selectedETFs.length > 0 && (
-                  <div className="mt-4">
-                    <p className="text-sm text-gray-400 mb-2">선택된 ETF:</p>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedETFs.map((etf) => (
-                        <span key={etf} className="flex items-center gap-2 bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-xl px-3 py-1 text-xs text-blue-300 backdrop-blur-sm">
-                          <span>{etf}</span>
-                          <button
-                            className="w-4 h-4 bg-red-500/20 hover:bg-red-500/40 rounded-full flex items-center justify-center text-red-400 hover:text-red-300 transition-colors duration-200"
-                            onClick={() => handleRemoveETF(etf)}
-                            type="button"
-                          >
-                            ✕
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
             

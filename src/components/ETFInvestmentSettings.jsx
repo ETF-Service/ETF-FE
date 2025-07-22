@@ -9,9 +9,9 @@ const ETFInvestmentSettings = ({ selectedETFs, onSettingsChange }) => {
 
   // 투자 주기 옵션
   const investmentCycles = [
-    { value: "daily", label: "매일", description: "매일 투자" },
-    { value: "weekly", label: "매주", description: "매주 투자" },
-    { value: "monthly", label: "매월", description: "매월 투자" },
+    { value: "daily", label: "매일" },
+    { value: "weekly", label: "매주" },
+    { value: "monthly", label: "매월" },
   ];
 
   // 요일 옵션 (매주 투자용)
@@ -176,42 +176,43 @@ const ETFInvestmentSettings = ({ selectedETFs, onSettingsChange }) => {
                   className="sr-only"
                 />
                 <span className="text-sm font-medium">{cycle.label}</span>
-                <span className="text-xs text-gray-400">{cycle.description}</span>
               </label>
             ))}
           </div>
         </div>
 
         {/* 투자 일 설정 */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            투자 일
-          </label>
-          <select
-            value={settings.day || "1"}
-            onChange={(e) => handleSettingChange(etfSymbol, 'day', e.target.value)}
-            className="w-full p-3 rounded-xl bg-gray-700/50 border border-gray-600/30 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 backdrop-blur-sm transition-all duration-200"
-          >
-            {settings.cycle === 'weekly' ? (
-              // 매주 투자 시 요일 선택
-              weekDays.map(day => (
-                <option key={day.value} value={day.value}>
-                  {day.label}
-                </option>
-              ))
-            ) : settings.cycle === 'monthly' ? (
-              // 매월 투자 시 일 선택
-              monthDays.map(day => (
-                <option key={day.value} value={day.value}>
-                  {day.label}
-                </option>
-              ))
-            ) : (
-              // 매일 투자 시 기본값
-              <option value="1">매일</option>
-            )}
-          </select>
-        </div>
+        {settings.cycle !== 'daily' && (
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              투자 일
+            </label>
+            <select
+              value={settings.day || "1"}
+              onChange={(e) => handleSettingChange(etfSymbol, 'day', e.target.value)}
+              className="w-full p-3 rounded-xl bg-gray-700/50 border border-gray-600/30 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 backdrop-blur-sm transition-all duration-200"
+            >
+              {settings.cycle === 'weekly' ? (
+                // 매주 투자 시 요일 선택
+                weekDays.map(day => (
+                  <option key={day.value} value={day.value}>
+                    {day.label}
+                  </option>
+                ))
+              ) : settings.cycle === 'monthly' ? (
+                // 매월 투자 시 일 선택
+                monthDays.map(day => (
+                  <option key={day.value} value={day.value}>
+                    {day.label}
+                  </option>
+                ))
+              ) : (
+                // 기본값
+                <option value="1">1일</option>
+              )}
+            </select>
+          </div>
+        )}
 
         {/* 투자 금액 설정 */}
         <div>
