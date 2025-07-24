@@ -100,6 +100,18 @@ class ApiService {
     });
   }
 
+  // 알림 설정 관련 API
+  async getNotificationSettings() {
+    return this.request('/users/me/notification-settings');
+  }
+
+  async updateNotificationSettings(settings) {
+    return this.request('/users/me/notification-settings', {
+      method: 'PUT',
+      body: JSON.stringify(settings),
+    });
+  }
+
   // 챗봇 관련 API
   async sendMessage(message) {
     return this.request('/chats', {

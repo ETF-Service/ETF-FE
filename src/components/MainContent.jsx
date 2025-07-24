@@ -23,9 +23,21 @@ const MainContent = () => {
     loadHistory 
   } = useChatStore();
 
-  // 컴포넌트 마운트 시 대화 히스토리 로드
+  // 컴포넌트 마운트 시 대화 히스토리 및 알림 설정 로드
   useEffect(() => {
     loadHistory();
+    
+    // 알림 설정 로드
+    const loadNotificationSettings = async () => {
+      try {
+        const settings = await apiService.getNotificationSettings();
+        setIsNotificationEnabled(settings.notification_enabled);
+      } catch (error) {
+        console.error('알림 설정 로드 실패:', error);
+      }
+    };
+    
+    loadNotificationSettings();
   }, [loadHistory]);
 
   // 메시지가 추가될 때마다 스크롤을 맨 아래로
@@ -95,9 +107,23 @@ const MainContent = () => {
     window.location.href = "/login";
   };
 
-  const toggleNotification = () => {
-    setIsNotificationEnabled(!isNotificationEnabled);
-    // 알림 설정 로직 (추후 구현)
+  const toggleNotification = async () => {
+    try {
+      const newStatus = !isNotificationEnabled;
+      setIsNotificationEnabled(newStatus);
+      
+      // 백엔드에 알림 설정 업데이트
+      await apiService.updateNotificationSettings({
+        notification_enabled: newStatus,
+        notification_channels: newStatus ? "app,email" : "app"
+      });
+      
+      console.log(`알림이 ${newStatus ? '활성화' : '비활성화'}되었습니다.`);
+    } catch (error) {
+      console.error('알림 설정 업데이트 실패:', error);
+      // 실패 시 원래 상태로 되돌리기
+      setIsNotificationEnabled(!isNotificationEnabled);
+    }
   };
 
   return (
