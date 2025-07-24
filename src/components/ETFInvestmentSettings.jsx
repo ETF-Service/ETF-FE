@@ -14,15 +14,15 @@ const ETFInvestmentSettings = ({ selectedETFs, onSettingsChange }) => {
     { value: "monthly", label: "매월" },
   ];
 
-  // 요일 옵션 (매주 투자용)
+  // 요일 옵션 (매주 투자용) - 월요일을 0으로 통일
   const weekDays = [
-    { value: "1", label: "월요일" },
-    { value: "2", label: "화요일" },
-    { value: "3", label: "수요일" },
-    { value: "4", label: "목요일" },
-    { value: "5", label: "금요일" },
-    { value: "6", label: "토요일" },
-    { value: "0", label: "일요일" },
+    { value: "0", label: "월요일" },
+    { value: "1", label: "화요일" },
+    { value: "2", label: "수요일" },
+    { value: "3", label: "목요일" },
+    { value: "4", label: "금요일" },
+    { value: "5", label: "토요일" },
+    { value: "6", label: "일요일" },
   ];
 
   // 일 옵션 (매월 투자용)
