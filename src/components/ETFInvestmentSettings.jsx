@@ -31,7 +31,7 @@ const ETFInvestmentSettings = ({ selectedETFs, onSettingsChange }) => {
     label: `${i + 1}일`,
   }));
 
-  // DB에서 ETF별 투자 설정 불러오기
+  // DB에서 ETF별 투자 설정 불러오기 (한 번만 실행)
   useEffect(() => {
     let isMounted = true;
     const fetchSettings = async () => {
@@ -50,23 +50,28 @@ const ETFInvestmentSettings = ({ selectedETFs, onSettingsChange }) => {
             };
           });
         }
-        if (isMounted) setEtfSettings(dbSettings);
-      } catch {
-        // DB에 정보가 없을 수도 있으니 무시
-        if (isMounted) setEtfSettings({});
+        if (isMounted) {
+          setEtfSettings(dbSettings);
+        }
+      } catch (error) {
+        console.error("ETF 설정 로드 실패:", error);
+        // DB에 정보가 없을 수도 있으니 기존 설정 유지 (빈 객체로 초기화하지 않음)
       } finally {
         if (isMounted) setIsFetching(false);
       }
     };
     fetchSettings();
     return () => { isMounted = false; };
-  }, []);
+  }, []); // 빈 의존성 배열로 한 번만 실행
 
-  // selectedETFs 변경 시, etfSettings에 없는 ETF는 기본값으로 추가
+  // selectedETFs 변경 시, 누락된 ETF만 추가 (기존 설정 보존)
   useEffect(() => {
     if (isFetching) return;
+    
     setEtfSettings(prev => {
       const newSettings = { ...prev };
+      
+      // 새로 선택된 ETF들에 대해 기본값 추가 (기존 설정 보존)
       selectedETFs.forEach(etf => {
         const etfSymbol = etf.split("(")[1].split(")")[0];
         if (!newSettings[etfSymbol]) {
@@ -77,16 +82,11 @@ const ETFInvestmentSettings = ({ selectedETFs, onSettingsChange }) => {
             name: etf
           };
         } else {
-          // name 동기화
+          // name 동기화 (기존 설정은 유지)
           newSettings[etfSymbol].name = etf;
         }
       });
-      // selectedETFs에 없는 ETF는 제거
-      Object.keys(newSettings).forEach(symbol => {
-        if (!selectedETFs.some(etf => etf.includes(symbol))) {
-          delete newSettings[symbol];
-        }
-      });
+      
       return newSettings;
     });
   }, [selectedETFs, isFetching]);
@@ -108,14 +108,18 @@ const ETFInvestmentSettings = ({ selectedETFs, onSettingsChange }) => {
     setMessage("");
 
     try {
-      // 설정 데이터 검증
-      const settingsArray = Object.entries(etfSettings).map(([symbol, settings]) => ({
-        symbol,
-        name: settings.name,
-        cycle: settings.cycle,
-        day: parseInt(settings.day),
-        amount: parseInt(settings.amount) || 0
-      }));
+      // 선택된 ETF의 설정만 필터링하여 전송
+      const settingsArray = Object.entries(etfSettings)
+        .filter(([symbol]) => 
+          selectedETFs.some(etf => etf.includes(symbol))
+        )
+        .map(([symbol, settings]) => ({
+          symbol,
+          name: settings.name,
+          cycle: settings.cycle,
+          day: parseInt(settings.day),
+          amount: parseInt(settings.amount) || 0
+        }));
 
       // API 호출하여 설정 저장
       await apiService.updateETFInvestmentSettings(settingsArray);
