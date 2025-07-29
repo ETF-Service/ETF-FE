@@ -115,7 +115,6 @@ const MainContent = () => {
       // 백엔드에 알림 설정 업데이트
       await apiService.updateNotificationSettings({
         notification_enabled: newStatus,
-        notification_channels: newStatus ? "app,email" : "app"
       });
       
       console.log(`알림이 ${newStatus ? '활성화' : '비활성화'}되었습니다.`);
@@ -240,15 +239,6 @@ const MainContent = () => {
             title="실시간 알림 설정"
           >
             <span className="text-xl">{isNotificationEnabled ? '🔔' : '🔕'}</span>
-          </button>
-
-          {/* 파일 업로드 버튼 - 개선된 디자인 */}
-          <button
-            className="h-14 w-14 bg-gray-700/50 hover:bg-gray-600/50 text-gray-300 rounded-2xl transition-all duration-300 flex items-center justify-center transform hover:scale-110 backdrop-blur-sm border border-gray-600/30"
-            onClick={() => setShowFileUpload(!showFileUpload)}
-            title="파일 업로드"
-          >
-            <span className="text-xl">📎</span>
           </button>
 
           {/* 메시지 입력 - 개선된 디자인 */}

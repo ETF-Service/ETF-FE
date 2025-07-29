@@ -1,6 +1,6 @@
 import useAuthStore from '../stores/authStore';
 
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = 'https://etf-be-production.up.railway.app';
 
 class ApiService {
   constructor() {
