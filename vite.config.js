@@ -12,12 +12,15 @@ export default defineConfig({
     port: 5173,
     host: true
   },
-  // SPA 라우팅을 위한 설정
+  // 프로덕션 빌드 설정
   build: {
+    outDir: 'dist',
     rollupOptions: {
       output: {
         manualChunks: undefined
       }
     }
-  }
+  },
+  // Vercel 배포를 위한 설정
+  base: '/'
 })
