@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import apiService from '../services/api';
 
 const useAuthStore = create(
   persist(
@@ -18,7 +19,16 @@ const useAuthStore = create(
         });
       },
       
-      logout: () => {
+      logout: async () => {
+        try {
+          // 서버에 로그아웃 요청
+          await apiService.logout();
+        } catch (error) {
+          console.error('로그아웃 API 호출 실패:', error);
+          // API 호출이 실패해도 로컬 상태는 초기화
+        }
+        
+        // 로컬 상태 초기화
         set({
           user: null,
           token: null,

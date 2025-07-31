@@ -55,6 +55,12 @@ class ApiService {
     return this.request('/users/me');
   }
 
+  async logout() {
+    return this.request('/auth/logout', {
+      method: 'POST',
+    });
+  }
+
   // ETF 관련 API (RESTful)
   async getUserInvestmentSettings() {
     return this.request('/users/me/settings');

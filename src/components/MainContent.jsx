@@ -102,9 +102,15 @@ const MainContent = () => {
     setShowFileUpload(false);
   };
 
-  const handleLogout = () => {
-    logout();
-    window.location.href = "/login";
+  const handleLogout = async () => {
+    try {
+      await logout();
+      window.location.href = "/login";
+    } catch (error) {
+      console.error('로그아웃 실패:', error);
+      // 로그아웃이 실패해도 로그인 페이지로 이동
+      window.location.href = "/login";
+    }
   };
 
   const toggleNotification = async () => {
