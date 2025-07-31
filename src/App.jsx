@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./components/Login";
 import MainContent from "./components/MainContent";
 import Signup from "./components/Signup";
@@ -13,14 +13,16 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/" element={
           <ProtectedRoute>
-          <div className="flex">
-            <Sidebar />
-            <div className="flex-1 pl-80">
-              <MainContent />
+            <div className="flex">
+              <Sidebar />
+              <div className="flex-1 pl-80">
+                <MainContent />
+              </div>
             </div>
-          </div>
           </ProtectedRoute>
         } />
+        {/* 404 처리를 위한 catch-all route */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
