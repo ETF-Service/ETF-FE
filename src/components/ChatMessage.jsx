@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatChatTime } from '../utils/timezone';
 
 const ChatMessage = ({ message, isStreaming = false }) => {
   const isUser = message.role === 'user';
@@ -31,10 +32,7 @@ const ChatMessage = ({ message, isStreaming = false }) => {
         
         <div className={`text-xs text-gray-500 mt-2 flex items-center gap-2 ${isUser ? 'justify-end' : 'justify-start'}`}>
           <span className="opacity-70">
-            {new Date(message.timestamp).toLocaleTimeString('ko-KR', {
-              hour: '2-digit',
-              minute: '2-digit'
-            })}
+            {formatChatTime(message.timestamp)}
           </span>
           {!isUser && (
             <span className="text-blue-400">💬 AI 상담사</span>
